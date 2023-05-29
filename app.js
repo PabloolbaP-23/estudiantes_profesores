@@ -3,24 +3,25 @@ const cardEstudiantes = document.querySelector("#cardEstudiantes");
 const cardProfesores = document.querySelector("#cardProfesores");
 const templateEstudiante = document.querySelector("#templateEstudiante").content;
 const templateProfesor = document.querySelector("#templateProfesor").content;
+const alert = document.querySelector(".alert");
 const estudiantes = [];
 const profesores = [];
 
 document.addEventListener('click', e => {
-    if (e.target.dataset.nombre) {
+    if (e.target.dataset.uid) {
         if (e.target.matches(".btn-success")) {
             estudiantes.map(item => {
-                if (item.nombre === e.target.dataset.nombre) {
+                if (item.uid === e.target.dataset.uid) {
                     item.setEstado = true;
                 }
                 return item;
             });
         }
     }
-    if (e.target.dataset.nombre) {
+    if (e.target.dataset.uid) {
         if (e.target.matches(".btn-danger")) {
             estudiantes.map(item => {
-                if (item.nombre === e.target.dataset.nombre) {
+                if (item.uid === e.target.dataset.uid) {
                     item.setEstado = false;
                 }
                 return item;
@@ -33,6 +34,7 @@ class Persona {
     constructor(nombre, edad) {
         this.nombre = nombre;
         this.edad = edad;
+        this.uid = `${Date.now()}`;
     }
     static pintarPersonaUI(personas, tipo) {
         if (tipo === "Estudiante") {
@@ -77,8 +79,8 @@ class Estudiante extends Persona{
             clone.querySelector(".btn-success").disabled = false;
         }
         clone.querySelector(".badge").textContent = this.#estado ? "Aprobado" : "Reprobado";
-        clone.querySelector('.btn-success').dataset.nombre = this.nombre
-        clone.querySelector('.btn-danger').dataset.nombre = this.nombre
+        clone.querySelector('.btn-success').dataset.uid = this.uid;
+        clone.querySelector('.btn-danger').dataset.uid = this.uid;
         return clone;       
     }
 }
@@ -95,8 +97,14 @@ class Profesor extends Persona{
 
 formulario.addEventListener('submit', e =>{
     e.preventDefault();
+    alert.classList.add("d-none");
     const datos = new FormData(formulario); // Par clave valor de los inputs
     const [nombre, edad, opcion] = [...datos.values()];
+    if (!nombre.trim() || !edad.trim() || !opcion.trim()) {
+        console.log("Algún dato en blanco");
+        alert.classList.remove("d-none");
+        return
+    }
     if (opcion === "Estudiante") {
         const estudiante = new Estudiante(nombre, edad);
         estudiantes.push(estudiante); 
